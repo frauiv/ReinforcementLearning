@@ -45,6 +45,19 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
+        
+        # calculating Vk+1
+        # in range of V iterations
+        for i in range(self.iterations):
+            # for each state in grid
+            for s in self.mdp.getStates():
+                stateVal = self.values[s]
+                # for each legal action from current state
+                for a in self.mdp.getLegalActions(s):
+                    for t in mdp.getTransitionStatesAndProbs(s,a):
+                        vk1 = t[1]*(self.mdp.getReward(s,a,t[0])+self.discount*self.values[t[1]])
+                        if(self.values[t[1]] <= vk1):
+                            self.values[t[1]] = vk1
 
 
     def getValue(self, state):
