@@ -45,19 +45,49 @@ class ValueIterationAgent(ValueEstimationAgent):
 
         # Write value iteration code here
         "*** YOUR CODE HERE ***"
-        
         # calculating Vk+1
         # in range of V iterations
         for i in range(self.iterations):
             # for each state in grid
+            valCopy = self.values.copy()
+            
             for s in self.mdp.getStates():
-                stateVal = self.values[s]
+                #stateVal = self.values[s]
                 # for each legal action from current state
-                for a in self.mdp.getLegalActions(s):
-                    for t in mdp.getTransitionStatesAndProbs(s,a):
-                        vk1 = t[1]*(self.mdp.getReward(s,a,t[0])+self.discount*self.values[t[1]])
-                        if(self.values[t[1]] <= vk1):
-                            self.values[t[1]] = vk1
+
+                #if not terminal state
+                if self.mdp.isTerminal(s) == False:
+                    #keep track of highest VK1 value 
+                    maxVK1 = float ("-inf")
+                    #for a in self.mdp.getLegalActions(s):
+                    
+                    for a in self.mdp.getPossibleActions(s):
+                        vk1 = 0
+                        for t in mdp.getTransitionStatesAndProbs(s,a):
+                            vk1 += t[1]*(self.mdp.getReward(s,a,t[0])+self.discount*self.values[t[0]])
+                            #if(self.values[t[1]] <= vk1):
+                                #self.values[t[1]] = vk1
+
+                        #update maxVK1  
+                        if vk1 > maxVK1:
+                            maxVK1 = vk1 
+
+                        valCopy[s] = maxVK1      
+                #is a terminal state 
+                else:           
+                    #for a in self.mdp.getLegalActions(s):
+                    
+                    for a in self.mdp.getPossibleActions(s):
+                        vk1 = 0
+                        for t in mdp.getTransitionStatesAndProbs(s,a):
+                            vk1 += t[1]*(self.mdp.getReward(s,a,t[0])+self.discount*self.values[t[0]]) 
+
+                        valCopy[s] = vk1                
+
+            self.values = valCopy               
+                           
+                           
+                            
 
 
     def getValue(self, state):
@@ -73,9 +103,15 @@ class ValueIterationAgent(ValueEstimationAgent):
           value function stored in self.values.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        sum = 0
+        for t in self.mdp.getTransitionStatesAndProbs(state, action):
+            sum += t[1] * (self.mdp.getReward(state, action, t[0]) + self.discount * self.values[t[0]])
 
-    def computeActionFromValues(self, state):
+        return sum    
+        
+        #util.raiseNotDefined()
+
+    #def computeActionFromValues(self, state):
         """
           The policy is the best action in the given state
           according to the values currently stored in self.values.
@@ -85,7 +121,28 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+        #if self.mdp.isTerminal(s) == False:
+
+        #util.raiseNotDefined()
+
+    def computeActionFromValues(self, state):
+        """
+          The policy is the best action in the given state
+          according to the values currently stored in self.values.
+          You may break ties any way you see fit.  Note that if
+          there are no legal actions, which is the case at the
+          terminal state, you should return None.
+        """
+        "*** YOUR CODE HERE ***"
+        possibleActions = self.mdp.getPossibleActions(state)
+        if self.mdp.isTerminal(state) == False:
+            bestAction = possibleActions[0]
+            bestQ = self.getQValue(state, bestAction)
+            for action in possibleActions:
+                if self.getQValue(state, action) > bestQ:
+                    bestQ = self.getQValue(state, action)
+                    bestAction = action
+            return bestAction
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
