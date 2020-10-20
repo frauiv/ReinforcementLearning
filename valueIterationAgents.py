@@ -121,28 +121,15 @@ class ValueIterationAgent(ValueEstimationAgent):
           terminal state, you should return None.
         """
         "*** YOUR CODE HERE ***"
-        #if self.mdp.isTerminal(s) == False:
-
-        #util.raiseNotDefined()
-
-    def computeActionFromValues(self, state):
-        """
-          The policy is the best action in the given state
-          according to the values currently stored in self.values.
-          You may break ties any way you see fit.  Note that if
-          there are no legal actions, which is the case at the
-          terminal state, you should return None.
-        """
-        "*** YOUR CODE HERE ***"
-        possibleActions = self.mdp.getPossibleActions(state)
+        actionsToCheck = self.mdp.getPossibleActions(state)
         if self.mdp.isTerminal(state) == False:
-            bestAction = possibleActions[0]
-            bestQ = self.getQValue(state, bestAction)
-            for action in possibleActions:
-                if self.getQValue(state, action) > bestQ:
-                    bestQ = self.getQValue(state, action)
-                    bestAction = action
-            return bestAction
+            besta = actionsToCheck[0]
+            bestq = self.getQValue(state, besta)
+            for a in actionsToCheck:
+                if self.getQValue(state, a) > bestq:
+                    bestq = self.getQValue(state, a)
+                    besta = a
+            return besta
 
     def getPolicy(self, state):
         return self.computeActionFromValues(state)
